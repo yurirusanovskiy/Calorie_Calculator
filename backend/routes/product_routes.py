@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from controllers.product_controller import (
     create_product,
     get_all_products,
@@ -12,8 +12,10 @@ from controllers.product_controller import (
 )
 from db import get_session
 from models.product import Product
+from controllers.user_controller import get_current_username
+from models.user import User
 
-router = APIRouter(prefix="/products", tags=["products"])
+router = APIRouter(prefix="/api/v1/products", tags=["products"])
 
 
 # Create a product
@@ -24,10 +26,12 @@ async def create_product_endpoint(
     calories_per_100g: int,
     file: UploadFile = File(None),
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_username),
 ):
     """
     Endpoint for creating a product and uploading a file.
     """
+    print(f"Product created by user: {current_user.username}")  # User Logging
     return await create_product(
         session=session,
         name=name,
@@ -38,13 +42,13 @@ async def create_product_endpoint(
 
 
 # Get all products
-@router.get("/products/", response_model=list[Product])
+@router.get("/", response_model=list[Product])
 async def get_all_products_route(session: AsyncSession = Depends(get_session)):
     return await get_all_products(session)
 
 
 # Update a product by ID
-@router.put("/products/{product_id}", response_model=Product)
+@router.put("/{product_id}", response_model=Product)
 async def update_product_route(
     product_id: int,
     name: str,
@@ -52,7 +56,12 @@ async def update_product_route(
     calories_per_100g: int,
     image_file: Optional[UploadFile] = File(None),
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_username),
 ):
+    """
+    Updates a product's information.
+    """
+    print(f"Product updated by user: {current_user.username}")  # User Logging
     product = await update_product(
         session, product_id, name, category, calories_per_100g, image_file
     )
@@ -62,10 +71,13 @@ async def update_product_route(
 
 
 # Get a product by ID
-@router.get("/products/{product_id}", response_model=Product)
+@router.get("/{product_id}", response_model=Product)
 async def get_product_by_id_route(
     product_id: int, session: AsyncSession = Depends(get_session)
 ):
+    """
+    Fetches a product by its ID.
+    """
     product = await get_product_by_id(session, product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -73,10 +85,13 @@ async def get_product_by_id_route(
 
 
 # Get a product by name
-@router.get("/products/name/{name}", response_model=Product)
+@router.get("/name/{name}", response_model=Product)
 async def get_product_by_name_route(
     name: str, session: AsyncSession = Depends(get_session)
 ):
+    """
+    Fetches a product by its name.
+    """
     product = await get_product_by_name(session, name)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -86,15 +101,14 @@ async def get_product_by_name_route(
 # Delete a product by id
 @router.delete("/{product_id}", summary="Delete a product")
 async def delete_product_route(
-    product_id: int, session: AsyncSession = Depends(get_session)
+    product_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_username),
 ):
     """
     Deletes a product and its associated file (if exists).
-
-    :param product_id: ID of the product to delete.
-    :param session: Database session.
-    :return: Success message upon deletion.
     """
+    print(f"Product deleted by user: {current_user.username}")  # User Logging
     try:
         await delete_product(session, product_id)
         return {"message": f"Product with ID {product_id} deleted successfully."}

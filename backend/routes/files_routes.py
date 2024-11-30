@@ -10,10 +10,10 @@ from controllers.file_controller import (
 )
 
 
-router = APIRouter(tags=["files"])
+router = APIRouter(prefix="/api/v1/files", tags=["files"])
 
 
-@router.get("/files/{file_name}", summary="Download a file")
+@router.get("/{file_name}", summary="Download a file")
 async def download_file(file_name: str):
     """
     Download a file from the 'static' directory.
@@ -30,7 +30,7 @@ async def download_file(file_name: str):
         raise e
 
 
-@router.get("/{file_name}", response_class=FileResponse)
+@router.get("/image/{file_name}", response_class=FileResponse)
 async def show_file(file_name: str):
     """
     Retrieve a file from the 'static' directory and return it as a response.

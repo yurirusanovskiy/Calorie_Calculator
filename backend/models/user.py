@@ -11,7 +11,9 @@ class User(BaseModel, table=True):
     email: str = Field(
         nullable=False, unique=True, index=True, description="Email of the user"
     )
-    password: str = Field(nullable=False, description="Password of the user")
+    hashed_password: str = Field(
+        nullable=False, description="Hashed Password of the user"
+    )
     weight: float = Field(
         nullable=False, description="Current weight of the user in kg"
     )

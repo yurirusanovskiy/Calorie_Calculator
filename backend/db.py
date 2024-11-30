@@ -8,9 +8,9 @@ from models.product import Product
 from models.record import Record
 from models.record_product import RecordProduct
 
+
 # Database URL for SQLite
 DATABASE_URL = os.getenv("DATABASE_URL")
-print(DATABASE_URL)
 
 # Creating an asynchronous engine
 engine = create_async_engine(DATABASE_URL, echo=True)

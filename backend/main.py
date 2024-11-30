@@ -1,14 +1,17 @@
-import os
 from dotenv import load_dotenv
+
+# Loading environment variables from .env
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from db import database, init_db
 from contextlib import asynccontextmanager
 from routes.product_routes import router as product_router
 from routes.files_routes import router as files_router
+from routes.record_router import router as record_router
+from routes.user_router import router as user_router
 
-# Loading environment variables from .env
-load_dotenv()
 
 # Define the lifespan context manager
 @asynccontextmanager
@@ -25,12 +28,15 @@ async def lifespan(app: FastAPI):
 
 
 # Initialize FastAPI app with lifespan handler
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan
+)  # app = FastAPI(dependencies=[Depends(get_current_user)])
 
-DATABASE_URL = os.getenv("DATABASE_URL")
 
 app.include_router(product_router)
 app.include_router(files_router)
+app.include_router(record_router)
+app.include_router(user_router)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
