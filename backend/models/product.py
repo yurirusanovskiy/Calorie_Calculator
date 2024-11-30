@@ -1,5 +1,5 @@
 from sqlmodel import Field, Relationship
-from typing import Optional
+from typing import Optional, List
 from models.base import BaseModel
 from models.record_product import RecordProduct
 
@@ -18,4 +18,5 @@ class Product(BaseModel, table=True):
     )
 
     # Delayed import for relationship to avoid circular import
-    records: Optional["RecordProduct"] = Relationship(back_populates="product")
+    # records: Optional["RecordProduct"] = Relationship(back_populates="product")
+    records: List["RecordProduct"] = Relationship(back_populates="product")

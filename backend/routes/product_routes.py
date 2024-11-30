@@ -19,7 +19,9 @@ router = APIRouter(prefix="/api/v1/products", tags=["products"])
 
 
 # Create a product
-@router.post("/")
+@router.post(
+    "/", response_model=Product, status_code=201, summary="Create a new product"
+)
 async def create_product_endpoint(
     name: str,
     category: str,

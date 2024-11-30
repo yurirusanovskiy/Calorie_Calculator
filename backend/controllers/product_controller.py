@@ -23,8 +23,8 @@ async def create_product(
         image_url = await save_file(file)
 
     product = Product(
-        name=name,
-        category=category,
+        name=name.title(),
+        category=category.title(),
         calories_per_100g=calories_per_100g,
         image_url=image_url,
     )
@@ -70,8 +70,8 @@ async def update_product(
     """Update an existing product's information."""
     product = await session.get(Product, product_id)
     if product:
-        product.name = name
-        product.category = category
+        product.name = name.title()
+        product.category = category.title()
         product.calories_per_100g = calories_per_100g
 
         # If a new file is sended, update it
