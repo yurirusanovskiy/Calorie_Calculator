@@ -2,5 +2,10 @@ from pydantic import BaseModel
 
 
 class RecordCreate(BaseModel):
-    product_id: int  # ID продукта
-    weight: int  # Вес продукта
+    product_id: int
+    weight: int
+
+
+class RecordUpdate(BaseModel):
+    product_id: int
+    weight: int

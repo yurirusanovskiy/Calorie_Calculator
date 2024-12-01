@@ -19,5 +19,4 @@ class Record(BaseModel, table=True):
         description="Last updated date of the record",
     )
 
-    # Убедитесь, что связь корректная, и используется правильная таблица для связи
     products: List["RecordProduct"] = Relationship(back_populates="record")
