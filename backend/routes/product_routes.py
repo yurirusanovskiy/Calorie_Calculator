@@ -56,7 +56,7 @@ async def update_product_route(
     name: str,
     category: str,
     calories_per_100g: int,
-    image_file: Optional[UploadFile] = File(None),
+    image_file: Optional[UploadFile] = File(None),  # File is optional, can be None
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_username),
 ):

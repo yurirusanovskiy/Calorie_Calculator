@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+import re
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserBase(BaseModel):
@@ -17,10 +18,31 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """
-    Schema for creating a new user.
+    Schema for creating a new user with password validation.
     """
 
-    password: str  # The user's password
+    password: str = Field(..., description="The user's password")
+
+    @field_validator("password")
+    def validate_password(cls, value: str) -> str:
+        """
+        Validate the password for:
+        - Minimum 8 characters
+        - At least one uppercase letter
+        - At least one digit
+        - At least one special character (.,;&?!)
+        """
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters long.")
+        if not re.search(r"[A-Z]", value):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        if not re.search(r"\d", value):
+            raise ValueError("Password must contain at least one digit.")
+        if not re.search(r"[.,;&?!]", value):
+            raise ValueError(
+                "Password must contain at least one special character (.,;&?!)."
+            )
+        return value
 
 
 class UserRead(UserBase):

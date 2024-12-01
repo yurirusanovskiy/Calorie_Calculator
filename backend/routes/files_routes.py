@@ -1,13 +1,13 @@
-from fastapi import APIRouter, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pathlib import Path
 from fastapi.responses import FileResponse
 
 from controllers.file_controller import (
-    save_file,
     get_file_path,
-    update_file,
     delete_file,
 )
+from controllers.user_controller import get_current_username
+from models.user import User
 
 
 router = APIRouter(prefix="/api/v1/files", tags=["files"])
@@ -63,7 +63,9 @@ async def show_file(file_name: str):
 
 
 @router.delete("/{file_name}", summary="Delete a file")
-async def delete_file_route(file_name: str):
+async def delete_file_route(
+    file_name: str, current_user: User = Depends(get_current_username)
+):
     """
     Delete a file from the 'static' directory.
 
@@ -79,34 +81,38 @@ async def delete_file_route(file_name: str):
         raise HTTPException(status_code=500, detail=f"Failed to delete file: {str(e)}")
 
 
-@router.post("/upload", summary="Upload a file")
-async def upload_file(file: UploadFile):
-    """
-    Upload a file to the 'static' directory.
+# @router.post("/upload", summary="Upload a file")
+# async def upload_file(file: UploadFile):
+#     """
+#     Upload a file to the 'static' directory.
 
-    :param file: The file to upload.
-    :return: The path to the uploaded file.
-    """
-    try:
-        file_path = await save_file(file)
-        return {"message": "File uploaded successfully", "file_path": file_path}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
+#     :param file: The file to upload.
+#     :return: The path to the uploaded file.
+#     """
+#     try:
+#         file_path = await save_file(file)
+#         return {"message": "File uploaded successfully", "file_path": file_path}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
 
 
-@router.put("/{old_file_name}", summary="Update a file")
-async def update_file_route(file: UploadFile, old_file_name: str):
-    """
-    Update an existing file by replacing it with a new one.
+# @router.put("/{old_file_name}", summary="Update a file")
+# async def update_file_route(
+#     file: UploadFile,
+#     old_file_name: str,
+#     current_user: User = Depends(get_current_username),
+# ):
+#     """
+#     Update an existing file by replacing it with a new one.
 
-    :param file: The new file to upload.
-    :param old_file_name: The name of the old file to replace.
-    :return: The path to the updated file.
-    """
-    try:
-        new_file_path = await update_file(file, old_file_name)
-        return {"message": "File updated successfully", "file_path": new_file_path}
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update file: {str(e)}")
+#     :param file: The new file to upload.
+#     :param old_file_name: The name of the old file to replace.
+#     :return: The path to the updated file.
+#     """
+#     try:
+#         new_file_path = await update_file(file, old_file_name)
+#         return {"message": "File updated successfully", "file_path": new_file_path}
+#     except HTTPException as e:
+#         raise e
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Failed to update file: {str(e)}")

@@ -18,5 +18,4 @@ class Product(BaseModel, table=True):
     )
 
     # Delayed import for relationship to avoid circular import
-    # records: Optional["RecordProduct"] = Relationship(back_populates="product")
     records: List["RecordProduct"] = Relationship(back_populates="product")

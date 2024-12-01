@@ -70,23 +70,25 @@ async def update_product(
     """Update an existing product's information."""
     product = await session.get(Product, product_id)
     if product:
+        # Updating product master data
         product.name = name.title()
         product.category = category.title()
         product.calories_per_100g = calories_per_100g
 
-        # If a new file is sended, update it
+        # If the image is not transferred, do not change the image_url
         if image_file:
             old_file_name = None
             if product.image_url:
                 # Extracting the old file name from the URL
                 old_file_name = product.image_url.split("/")[-1]
 
-            # Use update_file to update the image
+            # Use the function to update the image
             new_image_url = await update_file(image_file, old_file_name)
             product.image_url = new_image_url
 
         await session.commit()
         await session.refresh(product)
+
     return product
 
 
