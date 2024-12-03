@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from db import database, init_db
 from contextlib import asynccontextmanager
@@ -32,7 +33,14 @@ app = FastAPI(
     lifespan=lifespan
 )  # app = FastAPI(dependencies=[Depends(get_current_user)])
 
-
+# Connecting CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Specify allowed domains
+    allow_credentials=True,  # We allow the use of cookies
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # We allow any headers
+)
 app.include_router(product_router)
 app.include_router(files_router)
 app.include_router(record_router)
