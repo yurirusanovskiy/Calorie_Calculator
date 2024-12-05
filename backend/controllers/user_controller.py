@@ -1,6 +1,6 @@
 import os
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
@@ -24,7 +24,7 @@ ALGORITHM = os.getenv("ALGORITHM")
 # Function to generate JWT token
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=24)):
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

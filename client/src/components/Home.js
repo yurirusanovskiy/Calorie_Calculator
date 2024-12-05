@@ -132,21 +132,21 @@ const Home = () => {
         </button>
         <button
           className={styles.homeButton}
-          onClick={() => navigate("/settings")}
+          onClick={() => navigate("/change-product")}
         >
-          Go to Settings
+          Update Product
         </button>
         <button
           className={styles.homeButton}
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/delete-products")}
         >
-          Go to Products
+          Delete Products
         </button>
         <button
           className={styles.homeButton}
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/create-record")}
         >
-          Go to Products
+          Create Record
         </button>
         <button
           className={styles.homeButton}

@@ -9,7 +9,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/linkpage");
+    navigate("/login");
   };
 
   return (

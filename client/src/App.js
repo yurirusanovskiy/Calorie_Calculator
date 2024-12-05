@@ -6,7 +6,7 @@ import CreateDish from "./components/CreateDish";
 import Layout from "./components/Layout";
 import Missing from "./components/Missing";
 import Unauthorized from "./components/Unauthorized";
-import LinkPage from "./components/LinkPage";
+// import LinkPage from "./components/LinkPage";
 import RequireAuth from "./components/RequireAuth";
 import PersistLogin from "./components/PersistLogin";
 import { Routes, Route } from "react-router-dom";
@@ -22,7 +22,7 @@ function App() {
             {/* public routes */}
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="linkpage" element={<LinkPage />} />
+            {/* <Route path="linkpage" element={<LinkPage />} /> */}
             <Route path="unauthorized" element={<Unauthorized />} />
 
             {/* защищённые маршруты */}

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import styles from "../styles/AuthForm.module.css"; // Импортируем стили
+import styles from "../styles/AuthForm.module.css";
 import useAuth from "../hooks/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "../api/axios";
