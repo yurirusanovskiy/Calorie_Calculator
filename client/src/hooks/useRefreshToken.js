@@ -14,7 +14,7 @@ const useRefreshToken = () => {
         roles: response.data.roles,
         accessToken: response.data.accessToken,
       };
-      // Сохраняем весь объект auth в localStorage
+
       localStorage.setItem("auth", JSON.stringify(newAuth));
       return newAuth;
     });

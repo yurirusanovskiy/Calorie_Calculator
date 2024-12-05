@@ -14,28 +14,31 @@ const PersistLogin = () => {
     const verifyRefreshToken = async () => {
       try {
         const storedAuth = JSON.parse(localStorage.getItem("auth"));
-        // Проверка наличия токена в localStorage
+        console.log("Stored auth in PersistLogin:", storedAuth);
         if (storedAuth?.accessToken) {
           await refresh();
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error refreshing token:", err);
       } finally {
-        isMounted && setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    // persist added here AFTER tutorial video
-    // Avoids unwanted call to verifyRefreshToken
-    !auth?.accessToken && persist ? verifyRefreshToken() : setIsLoading(false);
+    if (!auth?.accessToken && persist) {
+      console.log("No auth token, trying to refresh...");
+      verifyRefreshToken();
+    } else {
+      console.log("Auth token exists or persist is off, no need to refresh.");
+      setIsLoading(false);
+    }
 
-    return () => (isMounted = false);
-  }, []);
-
-  useEffect(() => {
-    console.log(`isLoading: ${isLoading}`);
-    console.log(`aT: ${JSON.stringify(auth?.accessToken)}`);
-  }, [isLoading]);
+    return () => {
+      isMounted = false;
+    };
+  }, [auth?.accessToken, persist, refresh]);
 
   return (
     <>{!persist ? <Outlet /> : isLoading ? <p>Loading...</p> : <Outlet />}</>
