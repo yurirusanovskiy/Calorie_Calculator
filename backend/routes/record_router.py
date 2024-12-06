@@ -3,6 +3,7 @@ from controllers.record_controller import (
     create_record,
     get_all_records,
     get_record_by_id,
+    get_records_by_date,
     update_record,
     delete_record,
 )
@@ -38,6 +39,18 @@ async def get_all_user_records(
     Retrieve all records created by the authenticated user.
     """
     return await get_all_records(user=user, session=session)
+
+
+@router.get("/{date}", response_model=List[dict], summary="Get records by date")
+async def get_records_by_date_endpoint(
+    date: str,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_username),
+):
+    """
+    Retrieve records for a specific date (only the day part of the timestamp).
+    """
+    return await get_records_by_date(date=date, session=session, user_id=user.id)
 
 
 @router.get("/{record_id}", response_model=Record, summary="Get a record by ID")
