@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import List
 from fastapi import HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -10,7 +11,6 @@ from db import get_session
 from controllers.user_controller import get_current_username
 from models.user import User
 from schemas.record import RecordCreate, RecordUpdate
-# from sqlalchemy.exc import NoResultFound
 
 
 # Create a new record
@@ -66,17 +66,52 @@ async def get_all_records(
 async def get_record_by_id(record_id: int, user: User, session: AsyncSession):
     result = await session.execute(
         select(Record)
-        .options(joinedload(Record.products))  # Загружаем связанные продукты
+        .options(joinedload(Record.products))
         .filter(Record.id == record_id, Record.user_id == user.id)
     )
-    record = (
-        result.unique().scalar_one_or_none()
-    )  # Убираем дубликаты и выбираем одну запись
+    record = result.unique().scalar_one_or_none()
 
     if record is None:
         raise HTTPException(status_code=404, detail="Record not found")
 
     return record
+
+
+async def get_records_by_date(
+    date: str, session: AsyncSession, user_id: int
+) -> List[dict]:
+    """
+    Fetch all records for the authenticated user by date.
+    """
+    # We execute a query to get all records for a specific date
+    result = await session.execute(
+        select(Record)
+        .options(
+            joinedload(Record.products).joinedload(RecordProduct.product)
+        )  # Loading products and their information
+        .filter(Record.user_id == user_id)
+        .filter(Record.created.like(f"{date}%"))  # Filter by date
+    )
+
+    records = result.unique().scalars().all()
+
+    if not records:
+        raise HTTPException(status_code=404, detail="No records found for this date")
+
+    # We form a list of dictionaries with the necessary information
+    records_list = [
+        {
+            "name": product.product.name,
+            "image": product.product.image_url,
+            "product_calory": product.product.calories_per_100g,
+            "weight": product.weight,
+            "record_id": record.id,
+        }
+        for record in records
+        for product in record.products
+    ]
+
+    return records_list
 
 
 # Update a record
