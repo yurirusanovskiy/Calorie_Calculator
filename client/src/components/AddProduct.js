@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import styles from "../styles/AddProduct.module.css";
 
 const AddProduct = () => {
   const [name, setName] = useState("");
@@ -68,70 +69,82 @@ const AddProduct = () => {
   };
 
   return (
-    <div>
-      <h2>Add a New Product</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className={styles.container}>
+      <h2 className={styles.title}>Add a New Product</h2>
+      {error && <p className={styles.error}>{error}</p>}
 
       {/* Form for adding a product */}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Name</label>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.inputGroup}>
+          <label htmlFor="name" className={styles.label}>
+            Name
+          </label>
           <input
             type="text"
             id="name"
             value={name}
             onChange={handleNameChange}
             required
+            className={styles.input}
           />
         </div>
-        <div>
-          <label htmlFor="category">Category</label>
+        <div className={styles.inputGroup}>
+          <label htmlFor="category" className={styles.label}>
+            Category
+          </label>
           <input
             type="text"
             id="category"
             value={category}
             onChange={handleCategoryChange}
             required
+            className={styles.input}
           />
         </div>
-        <div>
-          <label htmlFor="calories">Calories per 100g</label>
+        <div className={styles.inputGroup}>
+          <label htmlFor="calories" className={styles.label}>
+            Calories per 100g
+          </label>
           <input
             type="number"
             id="calories"
             value={caloriesPer100g}
             onChange={handleCaloriesChange}
             required
+            className={styles.input}
           />
         </div>
-        <div>
-          <label htmlFor="image">Image (optional)</label>
-          <input type="file" id="image" onChange={handleImageChange} />
+        <div className={styles.inputGroup}>
+          <label htmlFor="image" className={styles.label}>
+            Image (optional)
+          </label>
+          <input
+            type="file"
+            id="image"
+            onChange={handleImageChange}
+            className={styles.input}
+          />
         </div>
-        <button type="submit">Create Product</button>
+        <button type="submit" className={styles.submitButton}>
+          Create Product
+        </button>
       </form>
 
       {/* Back button */}
-      <button onClick={() => navigate("/")} style={{ marginTop: "10px" }}>
+      <button onClick={() => navigate("/")} className={styles.backButton}>
         Back to Home
       </button>
 
       {/* Modal window */}
       {success && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "white",
-            padding: "20px",
-            boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)",
-            textAlign: "center",
-          }}
-        >
+        <div className={styles.modal}>
           <h3>Successfully created</h3>
-          <button onClick={() => setSuccess(false)}>OK</button>
+          <button
+            onClick={() => setSuccess(false)}
+            className={styles.modalButton}
+          >
+            OK
+          </button>
         </div>
       )}
     </div>

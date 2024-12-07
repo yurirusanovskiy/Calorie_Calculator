@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import TableEntries from "./TableEntries";
 
 const CreateRecord = () => {
   const [products, setProducts] = useState([]);
@@ -9,13 +10,18 @@ const CreateRecord = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [weight, setWeight] = useState("");
+  const [reloadTable, setReloadTable] = useState(false); // Flag to reload table
+  const [toastVisible, setToastVisible] = useState(false); // State for displaying notification
   const navigate = useNavigate();
 
-  // Достаем токен из локального хранилища
+  // Get current date in YYYY-MM-DD format
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  // Retrieving a token from localStorage
   const auth = JSON.parse(localStorage.getItem("auth"));
 
   useEffect(() => {
-    const token = auth?.accessToken; // Токен теперь извлекаем из объекта auth
+    const token = auth?.accessToken;
     if (!token) {
       console.error("No token found!");
       return;
@@ -23,6 +29,7 @@ const CreateRecord = () => {
 
     axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
+    // Getting products and unique categories
     axiosInstance
       .get("products")
       .then((response) => {
@@ -33,7 +40,7 @@ const CreateRecord = () => {
         setCategories(uniqueCategories);
       })
       .catch((error) => console.error("Failed to load products", error));
-  }, [auth?.accessToken]); // Добавляем auth?.accessToken в зависимости
+  }, [auth?.accessToken]);
 
   const filteredProducts = products.filter(
     (product) =>
@@ -47,7 +54,7 @@ const CreateRecord = () => {
       return;
     }
 
-    const token = auth?.accessToken; // Получаем токен
+    const token = auth?.accessToken;
     if (!token) {
       alert("User is not authorized!");
       return;
@@ -62,13 +69,15 @@ const CreateRecord = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Добавляем токен в заголовок запроса
+            Authorization: `Bearer ${token}`,
           },
         }
       )
       .then(() => {
         setWeight("");
-        alert("Record added successfully!");
+        setSelectedProduct(null);
+        setReloadTable((prev) => !prev); // Toggle flag to reload table
+        showToast(); // Show notification about adding
       })
       .catch((error) => {
         console.error("Failed to add record.", error);
@@ -76,10 +85,16 @@ const CreateRecord = () => {
       });
   };
 
+  const showToast = () => {
+    setToastVisible(true);
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 3000); // Hide notification after 3 seconds
+  };
+
   return (
     <div>
       <h1>Create Record</h1>
-
       <div>
         <label>
           Filter by category:
@@ -102,7 +117,6 @@ const CreateRecord = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
       <div>
         <label>
           Select product:
@@ -134,8 +148,15 @@ const CreateRecord = () => {
         </label>
         <button onClick={handleAddRecord}>Add</button>
       </div>
-
+      <TableEntries date={currentDate} auth={auth} reload={reloadTable} />
       <button onClick={() => navigate("/")}>Back</button>
+
+      {/* Message */}
+      {toastVisible && (
+        <div className="toast">
+          <p>Record added successfully!</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,23 +1,37 @@
 /* HomeForm.module.css */
 .homeContainer {
   display: flex;
+  flex-direction: column; /* Stack items vertically */
   gap: 20px;
 }
 
-.userInfoCard {
-  background-color: #d5e6cd;
-  border-radius: 8px;
+.cardsContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Adjust the gap between cards */
+}
+
+.userInfoCard,
+.actionCard,
+.tableCard {
+  flex: 1; /* Makes each card take equal space */
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 48%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #d5e6cd;
+}
+
+.userInfoCard {
+  width: 100%; /* Ensures full width on small screens */
 }
 
 .actionCard {
-  background-color: #d5e6cd;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 48%;
+  width: 100%; /* Ensures full width on small screens */
+}
+
+.tableCard {
+  width: 100%; /* Ensures full width on small screens */
 }
 
 .bmiTable {
@@ -66,4 +80,13 @@
 }
 .homeButton:hover {
   background-color: #0a4322;
+}
+
+.homeButton {
+  display: inline-block;
+}
+
+p {
+  font-weight: bold;
+  margin-top: 10px;
 }

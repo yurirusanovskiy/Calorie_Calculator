@@ -15,7 +15,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.headerTop}>
-        <h1 className={styles.title}>Calorie Calculator</h1>
+        <h1 className={styles.title}>Calorie Tracker</h1>
         <button onClick={handleLogout} className={styles.logoutButton}>
           Sign Out
         </button>
