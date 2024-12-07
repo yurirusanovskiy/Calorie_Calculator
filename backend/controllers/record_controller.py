@@ -101,6 +101,7 @@ async def get_records_by_date(
     # We form a list of dictionaries with the necessary information
     records_list = [
         {
+            "product_id": product.product.id,
             "name": product.product.name,
             "image": product.product.image_url,
             "product_calory": product.product.calories_per_100g,
