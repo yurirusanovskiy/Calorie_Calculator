@@ -1,3 +1,5 @@
+version: "3.9"
+
 networks:
   dev:
 
@@ -5,12 +7,10 @@ services:
   nginx:
     image: nginx:stable-alpine
     ports:
-      - "80:80"
-
+      - "8080:80"
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
-
-    depends-on:
+    depends_on:
       - backend
       - client
     networks:
@@ -19,6 +19,8 @@ services:
   backend:
     build:
       context: ./backend
+    ports:
+      - "8000:8000"
     networks:
       - dev
 
