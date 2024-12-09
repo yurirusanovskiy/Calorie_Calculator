@@ -105,26 +105,26 @@ The database schema is structured to represent relationships between users, prod
 ```mermaid
 erDiagram
     USERS {
-        int id PK
-        varchar username NOT NULL
-        varchar email UNIQUE NOT NULL
-        varchar password NOT NULL
-        float weight NOT NULL
-        int height NOT NULL
-        float target_weight NOT NULL
-        int time_frame DEFAULT 6
+        int id
+        varchar username
+        varchar email
+        varchar password
+        float weight
+        int height
+        float target_weight
+        int time_frame
     }
 
     RECORDS {
-        int id PK
-        int user_id FK
+        int id
+        int user_id
         int weight
         date created
         date updated
     }
 
     PRODUCTS {
-        int id PK
+        int id
         varchar name
         varchar type
         int calories_per_100g
@@ -132,8 +132,8 @@ erDiagram
     }
 
     RECORD_PRODUCT {
-        int record_id FK
-        int product_id FK
+        int record_id
+        int product_id
     }
 
     USERS ||--o{ RECORDS : "creates"
