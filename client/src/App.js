@@ -10,6 +10,7 @@ import Layout from "./components/Layout";
 import Unauthorized from "./components/Unauthorized";
 import RequireAuth from "./components/RequireAuth";
 import PersistLogin from "./components/PersistLogin";
+import UpdateProduct from "./components/UpdateProduct";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 
@@ -34,6 +35,7 @@ function App() {
                 <Route path="add-product" element={<AddProduct />} />{" "}
                 <Route path="create-dish" element={<CreateDish />} />{" "}
                 <Route path="create-record" element={<CreateRecord />} />{" "}
+                <Route path="update-product" element={<UpdateProduct />} />{" "}
               </Route>
             </Route>
           </Route>

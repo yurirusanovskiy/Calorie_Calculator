@@ -145,12 +145,6 @@ const Home = () => {
             </button>
             <button
               className={styles.homeButton}
-              onClick={() => navigate("/products")}
-            >
-              Go to Products
-            </button>
-            <button
-              className={styles.homeButton}
               onClick={() => navigate("/delete-product")}
             >
               Delete Products

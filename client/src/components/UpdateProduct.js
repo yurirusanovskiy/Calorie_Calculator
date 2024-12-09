@@ -1,45 +1,66 @@
 import React, { useState, useEffect } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/AddProduct.module.css";
+import styles from "../styles/UpdateProduct.module.css";
 
-const AddProduct = () => {
+const UpdateProduct = () => {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [caloriesPer100g, setCaloriesPer100g] = useState("");
   const [image, setImage] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
-  // Load categories from the API
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
         const response = await axios.get("/products/");
-        const uniqueCategories = Array.from(
-          new Set(response.data.map((product) => product.category))
-        );
-        setCategories(uniqueCategories);
+        setProducts(response.data);
+        setCategories([...new Set(response.data.map((p) => p.category))]);
       } catch (err) {
-        console.error(err.response?.data || err.message);
-        setError("Failed to fetch categories.");
+        setError("Failed to fetch products.");
       }
     };
 
-    fetchCategories();
+    fetchProducts();
   }, []);
 
-  // Change handlers
-  const handleNameChange = (e) => setName(e.target.value);
-  const handleCategoryChange = (e) => setCategory(e.target.value);
-  const handleCaloriesChange = (e) => setCaloriesPer100g(e.target.value);
-  const handleImageChange = (e) => setImage(e.target.files[0]);
+  const handleProductSelection = (e) => {
+    const productId = e.target.value;
+    setSelectedProductId(productId);
 
-  // Send data function
+    const selectedProduct = products.find(
+      (product) => product.id === +productId
+    );
+    if (selectedProduct) {
+      setName(selectedProduct.name);
+      setCategory(selectedProduct.category);
+      setCaloriesPer100g(selectedProduct.calories_per_100g.toString());
+    }
+  };
+
+  const handleCategoryFilter = (e) => {
+    const selectedCategory = e.target.value;
+    setCategory(selectedCategory);
+    setFilteredProducts(
+      selectedCategory
+        ? products.filter((p) => p.category === selectedCategory)
+        : products
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedProductId) {
+      setError("Please select a product to update.");
+      return;
+    }
 
     const token = localStorage.getItem("auth");
     if (!token) {
@@ -58,14 +79,14 @@ const AddProduct = () => {
       formData.append("file", image);
     }
 
-    const url = `products/?name=${encodeURIComponent(
+    const url = `/products/${selectedProductId}?name=${encodeURIComponent(
       name
     )}&category=${encodeURIComponent(
       category
     )}&calories_per_100g=${parsedCalories}`;
 
     try {
-      await axios.post(url, formData, {
+      await axios.put(url, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${JSON.parse(token).accessToken}`,
@@ -73,17 +94,54 @@ const AddProduct = () => {
       });
       setSuccess(true);
     } catch (err) {
-      console.error(err.response?.data || err.message);
-      setError("Failed to create the product. Please try again.");
+      setError("Failed to update the product. Please try again.");
     }
   };
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Add a New Product</h2>
+      <h2 className={styles.title}>Update Product</h2>
       {error && <p className={styles.error}>{error}</p>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.inputGroup}>
+          <label htmlFor="categoryFilter" className={styles.label}>
+            Filter by Category
+          </label>
+          <select
+            id="categoryFilter"
+            onChange={handleCategoryFilter}
+            value={category}
+            className={styles.select}
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat, index) => (
+              <option key={index} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label htmlFor="productSelect" className={styles.label}>
+            Select Product
+          </label>
+          <select
+            id="productSelect"
+            onChange={handleProductSelection}
+            value={selectedProductId}
+            className={styles.select}
+          >
+            <option value="">Select a product</option>
+            {(category ? filteredProducts : products).map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className={styles.inputGroup}>
           <label htmlFor="name" className={styles.label}>
             Name
@@ -92,11 +150,12 @@ const AddProduct = () => {
             type="text"
             id="name"
             value={name}
-            onChange={handleNameChange}
+            onChange={(e) => setName(e.target.value)}
             required
             className={styles.input}
           />
         </div>
+
         <div className={styles.inputGroup}>
           <label htmlFor="category" className={styles.label}>
             Category
@@ -105,17 +164,12 @@ const AddProduct = () => {
             type="text"
             id="category"
             value={category}
-            onChange={handleCategoryChange}
-            list="categories"
+            onChange={(e) => setCategory(e.target.value)}
             required
             className={styles.input}
           />
-          <datalist id="categories">
-            {categories.map((cat, index) => (
-              <option key={index} value={cat} />
-            ))}
-          </datalist>
         </div>
+
         <div className={styles.inputGroup}>
           <label htmlFor="calories" className={styles.label}>
             Calories per 100g
@@ -124,11 +178,12 @@ const AddProduct = () => {
             type="number"
             id="calories"
             value={caloriesPer100g}
-            onChange={handleCaloriesChange}
+            onChange={(e) => setCaloriesPer100g(e.target.value)}
             required
             className={styles.input}
           />
         </div>
+
         <div className={styles.inputGroup}>
           <label htmlFor="image" className={styles.label}>
             Image (optional)
@@ -136,12 +191,13 @@ const AddProduct = () => {
           <input
             type="file"
             id="image"
-            onChange={handleImageChange}
+            onChange={(e) => setImage(e.target.files[0])}
             className={styles.input}
           />
         </div>
+
         <button type="submit" className={styles.submitButton}>
-          Create Product
+          Update Product
         </button>
       </form>
 
@@ -151,7 +207,7 @@ const AddProduct = () => {
 
       {success && (
         <div className={styles.modal}>
-          <h3>Successfully created</h3>
+          <h3>Successfully updated</h3>
           <button
             onClick={() => setSuccess(false)}
             className={styles.modalButton}
@@ -164,4 +220,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default UpdateProduct;
