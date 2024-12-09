@@ -13,6 +13,8 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordMatchError, setPasswordMatchError] = useState(false);
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
@@ -26,10 +28,25 @@ const Register = () => {
 
   useEffect(() => {
     setErrMsg("");
-  }, [username, email, password, weight, height, targetWeight, timeFrame]);
+    setPasswordMatchError(false);
+  }, [
+    username,
+    email,
+    password,
+    confirmPassword,
+    weight,
+    height,
+    targetWeight,
+    timeFrame,
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setPasswordMatchError(true);
+      return;
+    }
+
     try {
       const response = await axios.post(
         REGISTER_URL,
@@ -50,6 +67,7 @@ const Register = () => {
       setUsername("");
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
       setWeight("");
       setHeight("");
       setTargetWeight("");
@@ -117,8 +135,27 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               required
-              className={styles.input}
+              className={`${styles.input} ${
+                passwordMatchError ? styles.error : ""
+              }`}
             />
+
+            <label htmlFor="confirmPassword" className={styles.label}>
+              Confirm Password:
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={confirmPassword}
+              required
+              className={`${styles.input} ${
+                passwordMatchError ? styles.error : ""
+              }`}
+            />
+            {passwordMatchError && (
+              <p className={styles.errorMessage}>Passwords do not match.</p>
+            )}
 
             <label htmlFor="weight" className={styles.label}>
               Weight (kg):
