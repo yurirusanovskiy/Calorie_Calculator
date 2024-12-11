@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
 import TableEntries from "./TableEntries";
+import styles from "../styles/CreateRecord.module.css";
 
 const CreateRecord = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [weight, setWeight] = useState("");
   const [reloadTable, setReloadTable] = useState(false); // Flag to reload table
@@ -43,9 +44,7 @@ const CreateRecord = () => {
   }, [auth?.accessToken]);
 
   const filteredProducts = products.filter(
-    (product) =>
-      (!selectedCategory || product.category === selectedCategory) &&
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (product) => !selectedCategory || product.category === selectedCategory
   );
 
   const handleAddRecord = () => {
@@ -93,12 +92,13 @@ const CreateRecord = () => {
   };
 
   return (
-    <div>
-      <h1>Create Record</h1>
-      <div>
+    <div className={styles.container}>
+      <h1 className={styles.heading}>Create Record</h1>
+      <div className={styles.filterGroup}>
         <label>
           Filter by category:
           <select
+            className={styles.select}
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -110,50 +110,51 @@ const CreateRecord = () => {
             ))}
           </select>
         </label>
-        <input
-          type="text"
-          placeholder="Search product"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
       </div>
-      <div>
-        <label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>
           Select product:
-          <select
-            value={selectedProduct?.id || ""}
-            onChange={(e) =>
+          <Select
+            className={styles.select}
+            options={filteredProducts.map((product) => ({
+              value: product.id,
+              label: product.name,
+            }))}
+            value={selectedProduct}
+            onChange={(selectedOption) =>
               setSelectedProduct(
-                products.find(
-                  (product) => product.id === parseInt(e.target.value)
+                filteredProducts.find(
+                  (product) => product.id === selectedOption.value
                 )
               )
             }
-          >
-            <option value="">Select</option>
-            {filteredProducts.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Search and select a product"
+            isClearable
+          />
         </label>
-        <label>
+        <label className={styles.label}>
           Enter weight (g):
           <input
             type="number"
+            className={styles.input}
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
           />
         </label>
-        <button onClick={handleAddRecord}>Add</button>
+        <button className={styles.button} onClick={handleAddRecord}>
+          Add
+        </button>
       </div>
-      <TableEntries date={currentDate} auth={auth} reload={reloadTable} />
-      <button onClick={() => navigate("/")}>Back</button>
+      <div className={styles.tableContainer}>
+        <TableEntries date={currentDate} auth={auth} reload={reloadTable} />
+      </div>
+      <button className={styles.button} onClick={() => navigate("/")}>
+        Back
+      </button>
 
       {/* Message */}
       {toastVisible && (
-        <div className="toast">
+        <div className={styles.toast}>
           <p>Record added successfully!</p>
         </div>
       )}
