@@ -56,6 +56,12 @@ const AddProduct = () => {
     const formData = new FormData();
     if (image) {
       formData.append("file", image);
+    } else {
+      // Append default image if none is provided
+      formData.append(
+        "file",
+        new File([""], "default.jpg", { type: "image/jpeg" })
+      );
     }
 
     const url = `products/?name=${encodeURIComponent(
